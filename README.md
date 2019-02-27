@@ -8,3 +8,4 @@ Extracts file tags (+tag in the filename) into markdown files
 - [ ] rewrite inde file
 - [ ] list of all files in subdirs
 - [ ] rewrite index files for subdirs
+- [ ] detect if rewriting is needed
