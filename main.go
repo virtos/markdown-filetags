@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -33,7 +34,8 @@ func main() {
 	targetDir, err := filepath.Abs(targetDir)
 	check(err)
 
-	processDir(targetDir)
+	fmt.Println(os.Args[0])
+	//processDir(targetDir)
 }
 
 func processDir(dir string) {
