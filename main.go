@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,7 +12,7 @@ import (
 const tagSymbol string = "+"
 const indexFileName string = "_filetags.md"
 
-var whiteSpaceDelim = [...]string{" ", "_"}
+var whiteSpaceDelim = [...]string{" ", "_", ".", "[", "]"}
 
 type tagFiles struct {
 	tag  string
@@ -20,6 +21,15 @@ type tagFiles struct {
 
 type tags struct {
 	tf []tagFiles
+}
+
+func initialize() (dir string, short bool) {
+	flag.BoolVar(&short, "s", true, "Include files from subdirectories")
+	flag.StringVar(&dir, "t", ".", "Target directory path")
+	flag.Parse()
+	dir, err := filepath.Abs(dir)
+	check(err)
+	return
 }
 
 func (tt *tags) append(tag, fileName string) {
@@ -53,6 +63,15 @@ func check(err error) {
 	}
 }
 
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func formatRes(tfs tags) string {
 	var str strings.Builder
 	for _, ctf := range tfs.tf {
@@ -69,25 +88,72 @@ func formatRes(tfs tags) string {
 	return str.String()
 }
 
-func getTags(fn string) []string {
+func getTags(source string) []string {
 	res := make([]string, 0)
-	fn = strings.ToLower(fn)
-	arr := strings.Split(fn, tagSymbol)
-	for i, elem := range arr {
-		if elem == "" {
+	source = " " + strings.ToLower(source)
+
+	flds := strings.FieldsFunc(source, func(r rune) bool {
+		if contains(whiteSpaceDelim[:], string(r)) {
+			return true
+		}
+		return false
+	})
+	for _, fld := range flds {
+		fld = strings.Trim(fld, " ")
+		if fld == "" || fld == tagSymbol {
 			continue
 		}
-		if i == 0 && fn[:1] != tagSymbol {
-			continue
+		if string([]rune(fld)[0:1]) == tagSymbol {
+			tag := string([]rune(fld)[1:])
+			if !contains(res, tag) {
+				res = append(res, tag)
+			}
 		}
-		// take the first value before any delimiter
-		elem += " "
-		res = append(res, elem[:strings.IndexAny(elem, " _.[]")])
 	}
 	return res
 }
 
-func processDir(dir string) {
+func appendSubdirTags(source, newTags tags, subdir string) tags {
+	for _, curTag := range newTags.tf {
+		for _, curFile := range curTag.file {
+			source.append(curTag.tag, subdir+"/"+curFile)
+			source.append(filepath.Base(subdir), subdir+"/"+curFile)
+		}
+	}
+	return source
+}
+
+func writeIndexFile(tfs tags, dir string) {
+	dstFName := filepath.Join(dir, indexFileName)
+	if len(tfs.tf) == 0 {
+		os.Remove(dstFName)
+		return
+	}
+
+	newInfo := formatRes(tfs)
+
+	dstClean := false
+	s, err := os.Stat(dstFName)
+	if err == nil && s.Size() == int64(len(newInfo)) {
+		if err == nil {
+			rawExs, _ := ioutil.ReadFile(dstFName)
+			if newInfo == string(rawExs) {
+				dstClean = true
+			}
+		}
+	}
+
+	if !dstClean {
+		os.Remove(dstFName)
+		f, err := os.Create(dstFName)
+		check(err)
+		defer f.Close()
+		_, err = f.WriteString(formatRes(tfs))
+		check(err)
+	}
+}
+
+func processDir(dir string, includeSubdirTags bool) tags {
 	var tfs tags
 
 	lst, err := ioutil.ReadDir(dir)
@@ -95,11 +161,12 @@ func processDir(dir string) {
 
 	for _, file := range lst {
 		if file.IsDir() {
-			defer processDir(filepath.Join(dir, file.Name()))
+			subdirTags := processDir(filepath.Join(dir, file.Name()), includeSubdirTags)
+			if includeSubdirTags {
+				tfs = appendSubdirTags(tfs, subdirTags, file.Name())
+			}
 			continue
-		} else if filepath.Ext(strings.TrimSpace(file.Name())) != ".md" {
-			continue
-		} else if !strings.Contains(file.Name(), tagSymbol) {
+		} else if filepath.Ext(strings.TrimSpace(file.Name())) != ".md" || file.Name() == indexFileName {
 			continue
 		}
 
@@ -113,25 +180,11 @@ func processDir(dir string) {
 		return tfs.tf[i].tag < tfs.tf[j].tag
 	})
 
-	// write result
+	writeIndexFile(tfs, dir)
 
-	if len(tfs.tf) > 0 {
-		f, err := os.Create(filepath.Join(dir, indexFileName))
-		check(err)
-		defer f.Close()
-		_, err = f.WriteString(formatRes(tfs))
-		check(err)
-	}
+	return tfs
 }
 
 func main() {
-	targetDir := "."
-	args := os.Args
-	if len(args) > 1 {
-		targetDir = args[1]
-	}
-	targetDir, err := filepath.Abs(targetDir)
-	check(err)
-
-	processDir(targetDir)
+	processDir(initialize())
 }
