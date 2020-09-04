@@ -1,4 +1,5 @@
 # The question
+
 I like to have control over my notes and keep them on my device. Should I use a directory structure or tags?
 
 # The answer
@@ -44,35 +45,51 @@ Contents of the _filetags.md file in "My Notes" folder:
 ----
 
 <details markdown='1'><summary markdown='1'>contats</summary>
-<li><a href="readme.md">Contats/Bob +friend +work</a>
-<li><a href="readme.md">Contats/Laura +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Contats/Bob +friend +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Contats/Laura +work</a>
 </details>
 
 <details markdown='1'><summary markdown='1'>editor</summary>
-<li><a href="readme.md">Links/epsilon +editor</a>
-<li><a href="readme.md">Links/typora +editor</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Links/epsilon +editor</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Links/typora +editor</a>
 </details>
 
 <details markdown='1'><summary markdown='1'>friend</summary>
-<li><a href="readme.md">Contats/Bob +friend +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Contats/Bob +friend +work</a>
 </details>
 
 <details markdown='1'><summary markdown='1'>links</summary>
-<li><a href="readme.md">Links/epsilon +editor</a>
-<li><a href="readme.md">Links/microsoft +work</a>
-<li><a href="readme.md">Links/typora +editor</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Links/epsilon +editor</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Links/microsoft +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Links/typora +editor</a>
 </details>
 
 <details markdown='1'><summary markdown='1'>work</summary>
-<li><a href="readme.md">Contats/Bob +friend +work</a>
-<li><a href="readme.md">Contats/Laura +work</a>
-<li><a href="readme.md">Links/microsoft +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Contats/Bob +friend +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Contats/Laura +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Links/microsoft +work</a>
 </details>
 
 ----
 
-As you can see the program collected tags for all notes and they are hyperlinked to the notes themselves!  
+As you can see the program collected tags for all notes. Clicking on a hyperlink will open a corresponding note.  
+
 Index files in subfolders will only reference notes below them, so if you only want to see contacts related to work, go to contacts folder and find work tag in the index file.
+
+Contents of the _filetags.md file in "Contacts" folder:
+
+----
+<details markdown='1'><summary markdown='1'>friend</summary>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Bob +friend +work</a>
+</details>
+
+<details markdown='1'><summary markdown='1'>work</summary>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Bob +friend +work</a>
+<li><a href="https://github.com/virtos/markdown-filetags/blob/master/README.md">Laura +work</a>
+</details>
+
+----
+
 
 # Unrelated notes
 Using plain file structure with markdown notes is a very powerful system allowing you to keep your data private and secure. It's just text, so you will never lose it, you will never have to pay someone to keep them and you will never worry about your note application developer going out of business or doing something stupid. Enjoy!
